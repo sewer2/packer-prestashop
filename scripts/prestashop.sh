@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash -xe
 #sleep 600m
 #exit 0
 date "+%Y-%m-%d %H:%M:%S"
