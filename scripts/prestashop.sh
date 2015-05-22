@@ -1,5 +1,6 @@
-#!/bin/bash -xe
-
+#!/bin/bash -x
+#sleep 600m
+#exit 0
 date "+%Y-%m-%d %H:%M:%S"
 
 apt-get update
@@ -53,22 +54,29 @@ juju set mysql query-cache-type=ON
 juju set mysql query-cache-size=-1
 juju deploy --repository=charms/ local:trusty/prestashop --to 0 || juju deploy --repository=charms/ local:trusty/prestashop --to 0 || exit 1;
 
-sed s/"Listen 80"/"#Listen 80"/ /etc/apache2/ports.conf > /tmp/ports.conf && mv /tmp/ports.conf /etc/apache2/ports.conf
-service apache2 restart
-
 juju add-relation mysql prestashop
 
 juju expose prestashop
 
-juju deploy --repository=charms/ local:trusty/haproxy --to 0
-juju add-relation haproxy prestashop
 
-for s in mysql prestashop haproxy; do
+for s in mysql prestashop; do
     while true; do
         juju status $s/0 --format=json | jq ".services.$s.units" | grep -q '"agent-state": "started"' && break
         echo "waiting 5s"
         sleep 5s
     done
+done
+
+sed s/"Listen 80"/"#Listen 80"/ /etc/apache2/ports.conf > /tmp/ports.conf && mv /tmp/ports.conf /etc/apache2/ports.conf
+service apache2 restart
+
+juju deploy --repository=charms/ local:trusty/haproxy --to 0
+juju add-relation haproxy prestashop
+
+while true; do
+  juju status $s/0 --format=json | jq ".services.haproxy.units" | grep -q '"agent-state": "started"' && break
+  echo "waiting 5s"
+  sleep 5s
 done
 
 while true; do
