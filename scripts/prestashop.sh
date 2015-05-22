@@ -53,6 +53,9 @@ juju set mysql query-cache-type=ON
 juju set mysql query-cache-size=-1
 juju deploy --repository=charms/ local:trusty/prestashop --to 0 || juju deploy --repository=charms/ local:trusty/prestashop --to 0 || exit 1;
 
+sed s/"Listen 80"/"#Listen 80"/ /etc/apache2/ports.conf > /tmp/ports.conf && mv /tmp/ports.conf /etc/apache2/ports.conf
+service apache2 restart
+
 juju add-relation mysql prestashop
 
 juju expose prestashop
