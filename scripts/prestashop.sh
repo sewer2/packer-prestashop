@@ -7,7 +7,7 @@ apt-get -y --force-yes install software-properties-common jq curl
 
 add-apt-repository --yes ppa:juju/stable
 apt-get -y --force-yes update
-apt-get -y --force-yes install juju-core sudo lxc git-core aufs-tools
+apt-get -y --force-yes install juju-core sudo git-core aufs-tools
 useradd -G sudo -s /bin/bash -m -d /home/ubuntu ubuntu
 mkdir -p /root/.ssh
 test -f /root/.ssh/juju || ssh-keygen -t rsa -b 4096 -f /root/.ssh/juju -N ''
@@ -44,7 +44,7 @@ apt-get -y install python-yaml
 mkdir -p charms/trusty
 
 git clone -b trusty https://github.com/vtolstov/charm-mysql charms/trusty/mysql
-git clone https://github.com/mozaroc/charm-prestashop.git charms/trusty/prestashop
+git clone https://github.com/ClodoCorp/charm-prestashop.git charms/trusty/prestashop
 git clone -b trusty https://github.com/vtolstov/charm-haproxy charms/trusty/haproxy
 
 juju deploy --repository=charms/ local:trusty/mysql --to 0 || juju deploy --repository=charms/ local:trusty/mysql --to 0 || exit 1;

@@ -35,7 +35,7 @@
       "iso_checksum_type": "md5",
       "iso_url": "http://releases.ubuntu.com/14.04/ubuntu-14.04.2-server-amd64.iso",
       "net_device": "virtio-net",
-      "output_directory": "output/prestashop-1609-x86_64-qemu/",
+      "output_directory": "output/prestashop-1.6.0.9-x86_64-qemu/",
       "machine_type": "pc-i440fx-1.7",
       "qemuargs": [
         [
@@ -48,7 +48,7 @@
       "ssh_username": "root",
       "ssh_wait_timeout": "1200s",
       "type": "qemu",
-      "vm_name": "prestashop-1609-x86_64"
+      "vm_name": "prestashop-1.6.0.9-x86_64"
     }
   ],
   "provisioners": [
@@ -76,12 +76,12 @@
         "type": "compress",
         "format": "bgzf",
         "metadata": true,
-        "output": "output/prestashop-1609-x86_64-compress/",
+        "output": "output/prestashop-1.6.0.9-x86_64-compress/",
         "only": ["qemu"]
       },
       {
         "type": "checksum",
-        "output": "output/prestashop-1609-x86_64-compress/"
+        "output": "output/prestashop-1.6.0.9-x86_64-compress/"
       }
     ]
   ]
