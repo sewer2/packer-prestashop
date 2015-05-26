@@ -1,6 +1,4 @@
-#!/bin/bash -xe
-#sleep 600m
-#exit 0
+#!/bin/bash -ex
 date "+%Y-%m-%d %H:%M:%S"
 
 apt-get update
@@ -44,14 +42,16 @@ juju bootstrap --debug
 apt-get -y install python-yaml
 mkdir -p charms/trusty
 
-git clone -b trusty https://github.com/vtolstov/charm-mysql charms/trusty/mysql
+git clone -b trusty https://github.com/ClodoCorp/charm-mysql.git charms/trusty/mysql
 git clone https://github.com/ClodoCorp/charm-prestashop.git charms/trusty/prestashop
-git clone -b trusty https://github.com/vtolstov/charm-haproxy charms/trusty/haproxy
+git clone https://github.com/ClodoCorp/packer-nginx-cache-proxy.git charms/trusty/nginx
+
 
 juju deploy --repository=charms/ local:trusty/mysql --to 0 || juju deploy --repository=charms/ local:trusty/mysql --to 0 || exit 1;
 juju set mysql dataset-size=50%
 juju set mysql query-cache-type=ON
 juju set mysql query-cache-size=-1
+juju set mysql bind-address='127.0.0.1'
 juju deploy --repository=charms/ local:trusty/prestashop --to 0 || juju deploy --repository=charms/ local:trusty/prestashop --to 0 || exit 1;
 
 juju add-relation mysql prestashop
@@ -67,24 +67,30 @@ for s in mysql prestashop; do
     done
 done
 
-sed s/"Listen 80"/"#Listen 80"/ /etc/apache2/ports.conf > /tmp/ports.conf && mv /tmp/ports.conf /etc/apache2/ports.conf
+sed -i "s/Listen 80/#Listen 80/" /etc/apache2/ports.conf
 service apache2 restart
 
-juju deploy --repository=charms/ local:trusty/haproxy --to 0
-juju add-relation haproxy prestashop
+juju deploy --repository=charms/ local:trusty/nginx --to 0 || juju deploy --repository=charms/ local:trusty/nginx-     proxy --to 0 || exit 1;
+
+juju add-relation prestashop nginx
+juju set nginx cache=true 
+juju set nginx default-route="prestashop"
+
+for s in nginx; do
+  while true; do
+    juju status $s/0 --format=json | jq ".services.$s.units" | grep -q '"agent-state": "started"' && break
+    echo "waiting 5s"
+    sleep 5s
+  done
+done
+
 
 while true; do
-  juju status $s/0 --format=json | jq ".services.haproxy.units" | grep -q '"agent-state": "started"' && break
+  curl -L -s http://127.0.0.1 2>&1 >/dev/null && break
   echo "waiting 5s"
   sleep 5s
 done
 
-while true; do
-    curl -L -s http://127.0.0.1 2>&1 >/dev/null && break
-    echo "waiting 5s"
-    sleep 5s
-done
-
-date "+%Y-%m-%d %H:%M:%S"
+dat "+%Y-%m-%d %H:%M:%S"
 
 #fstrim -v /
