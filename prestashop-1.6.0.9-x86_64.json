@@ -29,7 +29,7 @@
       "disk_cache": "unsafe",
       "disk_discard": "unmap",
       "format": "raw",
-      "headless": false,
+      "headless": true,
       "http_directory": "http",
       "iso_checksum": "83aabd8dcf1e8f469f3c72fff2375195",
       "iso_checksum_type": "md5",
