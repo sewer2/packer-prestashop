@@ -71,7 +71,7 @@ sed -i "s/Listen 80/#Listen 80/" /etc/apache2/ports.conf
 service apache2 restart
 
 cp /etc/rc.local /etc/rc.local.tmp
-echo -e '#!/bin/bash\nwhile true; do if ls /srv/www/htdocs | grep -q admin.; then rm -rf /srv/www/htdocs/install; mv -f /etc/rc.local.tmp /etc/rc.local;  break; fi; done' > /etc/rc.local
+echo -e '#!/bin/bash\nwhile true; do if ls /srv/www/htdocs | grep -q admin.; then rm -rf /srv/www/htdocs/install; mv -f /etc/rc.local.tmp /etc/rc.local;  break; fi; sleep 1; done' > /etc/rc.local
 
 juju deploy --repository=charms/ local:trusty/nginx --to 0 || juju deploy --repository=charms/ local:trusty/nginx --to 0 || exit 1;
 
